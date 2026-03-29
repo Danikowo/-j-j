@@ -1,37 +1,85 @@
+:/* ПЕРЕМЕННЫЕ ЦВЕТОВ */
 :root {
-    --primary-blue: #2563eb;       /* Насыщенный синий */
-    --hover-blue: #1d4ed8;         /* Темно-синий для наведения */
-    --tg-blue: #0088cc;            /* Официальный цвет Telegram */
-    --soft-blue-bg: #eff6ff;       /* Нежно-голубой для инпутов */
-    --text-dark: #1e293b;
-    --shadow-color: rgba(37, 99, 235, 0.15);
+    /* Темная тема (по умолчанию) */
+    --bg-page: #0f172a;           /* Глубокий темный фон */
+    --bg-form: #1e293b;           /* Темно-синяя форма */
+    --text-main: #f8fafc;         /* Белый текст */
+    --text-label: #3b82f6;        /* Синий для подписей */
+    --input-bg: #334155;          /* Темный фон инпутов */
+    --primary-blue: #3b82f6;      
+    --hover-blue: #2563eb;
+    --tg-blue: #0088cc;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --border-color: #334155;
 }
 
-/* Фон страницы — чистый белый */
+/* Светлая тема (активируется через JS) */
+body.light-theme {
+    --bg-page: #ffffff;
+    --bg-form: #ffffff;
+    --text-main: #1e293b;
+    --text-label: #2563eb;        /* Твой насыщенный синий */
+    --input-bg: #eff6ff;          /* Твой нежно-голубой */
+    --primary-blue: #2563eb;
+    --hover-blue: #1d4ed8;
+    --tg-blue: #0088cc;
+    --shadow-color: rgba(37, 99, 235, 0.15);
+    --border-color: #e2e8f0;
+}
+
+/* ОБЩИЕ СТИЛИ */
 body {
-    background-color: #ffffff;
+    background-color: var(--bg-page);
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    transition: background-color 0.3s ease; /* Плавный переход */
+}
+
+/* КНОПКА ПЕРЕКЛЮЧЕНИЯ (Справа сверху) */
+#theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 12px;
+    background: var(--bg-form);
+    color: var(--text-main);
+    border: 2px solid var(--primary-blue);
+    border-radius: 50%; /* Круглая кнопка */
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transition: all 0.3s ease;
+}
+
+#theme-toggle:hover {
+    transform: scale(1.1);
 }
 
 .form-container {
     max-width: 400px;
     width: 100%;
     padding: 40px;
-    background: #ffffff;
+    background: var(--bg-form);
     border-radius: 24px;
-    /* Синеватая мягкая тень, чтобы форма "парила" */
     box-shadow: 0 20px 50px var(--shadow-color);
     font-family: 'Inter', -apple-system, sans-serif;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
 h1 {
     text-align: center;
-    color: var(--text-dark);
+    color: var(--text-main);
     margin-bottom: 30px;
     font-size: 26px;
     font-weight: 850;
@@ -46,7 +94,7 @@ h1 {
 
 label {
     font-weight: 700;
-    color: var(--primary-blue); /* Лейблы тоже синие для стиля */
+    color: var(--text-label);
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
@@ -57,11 +105,11 @@ input,
 textarea {
     width: 100%;
     padding: 16px;
-    background: var(--soft-blue-bg);
+    background: var(--input-bg);
     border: 2px solid transparent;
     border-radius: 14px;
     font-size: 16px;
-    color: var(--text-dark);
+    color: var(--text-main);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-sizing: border-box;
 }
@@ -69,7 +117,7 @@ textarea {
 input:focus,
 textarea:focus {
     outline: none;
-    background: #ffffff;
+    background: var(--bg-form);
     border-color: var(--primary-blue);
     box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.1);
 }
@@ -86,7 +134,7 @@ button {
     letter-spacing: 1px;
 }
 
-/* Основная кнопка - ярко-синий градиент */
+/* Кнопка POST (Синяя) */
 #post {
     background: linear-gradient(135deg, var(--primary-blue), #3b82f6);
     color: white;
@@ -94,9 +142,9 @@ button {
     box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
 }
 
-/* Кнопка Telegram - более легкая */
+/* Кнопка TG (Прозрачная/Белая) */
 #tg {
-    background-color: white;
+    background-color: var(--bg-form);
     color: var(--tg-blue);
     border: 2px solid var(--tg-blue);
 }
@@ -123,3 +171,4 @@ textarea {
     resize: none;
     min-height: 120px;
 }
+
