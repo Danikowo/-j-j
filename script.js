@@ -38,3 +38,29 @@ form.addEventListener("submit", async function(event) {
         alert("🚨 Критическая ошибка: проверьте соединение или Vercel Logs");
     }
 });
+const themeToggle = document.getElementById("theme-toggle");
+const currentTheme = localStorage.getItem("theme");
+
+// 1. Проверяем, была ли сохранена тема ранее
+if (currentTheme === "light") {
+    document.body.classList.add("light-theme");
+    themeToggle.textContent = "☀️"; // Иконка для светлой
+} else {
+    themeToggle.textContent = "🌙"; // Иконка для темной
+}
+
+// 2. Слушаем клик по кнопке
+themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("light-theme");
+    
+    let theme = "dark";
+    if (document.body.classList.contains("light-theme")) {
+        theme = "light";
+        themeToggle.textContent = "☀️";
+    } else {
+        themeToggle.textContent = "🌙";
+    }
+    
+    // 3. Сохраняем выбор пользователя
+    localStorage.setItem("theme", theme);
+});
