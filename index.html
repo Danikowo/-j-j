@@ -8,23 +8,26 @@
 	</head>
 	<body>
 		<div class="form-container">
-			<h1>Оставить отзыв</h1>
-			<form id="form" action="https://api.web3forms.com/submit" method="POST">
-				<label for="name">Имя:</label>
-				<input name="name" required placeholder="Ваше Имя" />
+    <h1>Оставить отзыв</h1>
+    <!-- Убрали action, чтобы работал наш script.js -->
+    <form id="form">
+        <label for="name">Имя:</label>
+        <input name="name" id="name" required placeholder="Ваше Имя" />
 
-				<label for="text">Текст отзыва:</label>
-				<textarea
-					name="text"
-					rows="5"
-					required
-					placeholder="Напишите ваш отзыв..."
-				></textarea>
+        <label for="text">Текст отзыва:</label>
+        <textarea
+            name="text"
+            id="text"
+            rows="5"
+            required
+            placeholder="Напишите ваш отзыв..."
+        ></textarea>
 
-				<button type="submit" id="post">Отправить на почту</button>
-				<button type="submit" id="tg">Отправить в ТГ</button>
-			</form>
-		</div>
+        <!-- Кнопка для ТГ -->
+        <button type="submit" id="tg">Отправить в ТГ</button>
+    </form>
+</div>
+
 
 		<script src="script.js"></script>
 	</body>
