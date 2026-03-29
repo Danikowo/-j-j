@@ -1,117 +1,125 @@
 :root {
-    /* Основная палитра */
-    --bg-page: #0f172a; /* Темный фон для всей страницы, если нужно */
-    --accent-emerald: #059669;
-    --accent-gold: #fbbf24;
-    --card-bg: #ffffff;
-    --input-focus: #10b981;
+    --primary-blue: #2563eb;       /* Насыщенный синий */
+    --hover-blue: #1d4ed8;         /* Темно-синий для наведения */
+    --tg-blue: #0088cc;            /* Официальный цвет Telegram */
+    --soft-blue-bg: #eff6ff;       /* Нежно-голубой для инпутов */
+    --text-dark: #1e293b;
+    --shadow-color: rgba(37, 99, 235, 0.15);
+}
+
+/* Фон страницы — чистый белый */
+body {
+    background-color: #ffffff;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
 .form-container {
-    max-width: 420px;
-    margin: 60px auto;
+    max-width: 400px;
+    width: 100%;
     padding: 40px;
-    background: var(--card-bg);
-    border-radius: 30px; /* Еще более мягкие углы */
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    border: 1px solid #f1f5f9;
+    background: #ffffff;
+    border-radius: 24px;
+    /* Синеватая мягкая тень, чтобы форма "парила" */
+    box-shadow: 0 20px 50px var(--shadow-color);
+    font-family: 'Inter', -apple-system, sans-serif;
+    border: 1px solid #e2e8f0;
 }
 
 h1 {
     text-align: center;
-    color: #064e3b; /* Глубокий зеленый */
-    margin-bottom: 32px;
+    color: var(--text-dark);
+    margin-bottom: 30px;
     font-size: 26px;
-    font-weight: 800;
-    letter-spacing: -1px;
+    font-weight: 850;
+    letter-spacing: -0.5px;
 }
 
 #form {
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 18px;
 }
 
 label {
     font-weight: 700;
-    color: #374151;
+    color: var(--primary-blue); /* Лейблы тоже синие для стиля */
     font-size: 13px;
-    margin-left: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-/* Маленькая точка перед лейблом для стиля */
-label::before {
-    content: '';
-    width: 4px;
-    height: 4px;
-    background: var(--accent-emerald);
-    border-radius: 50%;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-left: 4px;
 }
 
 input,
 textarea {
     width: 100%;
-    padding: 15px 20px;
-    background: #f8fafc;
+    padding: 16px;
+    background: var(--soft-blue-bg);
     border: 2px solid transparent;
-    border-radius: 16px;
-    font-size: 15px;
-    color: #1e293b;
-    transition: all 0.3s ease;
+    border-radius: 14px;
+    font-size: 16px;
+    color: var(--text-dark);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
 }
 
 input:focus,
 textarea:focus {
     outline: none;
-    background: #fff;
-    border-color: var(--input-focus);
-    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1);
+    background: #ffffff;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.1);
 }
 
 button {
     padding: 16px;
     border: none;
-    border-radius: 16px;
-    font-size: 15px;
+    border-radius: 14px;
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
+/* Основная кнопка - ярко-синий градиент */
 #post {
-    background: #065f46; /* Изумрудный */
-    color: #ecfdf5;
-    box-shadow: 0 4px 12px rgba(6, 95, 70, 0.2);
+    background: linear-gradient(135deg, var(--primary-blue), #3b82f6);
+    color: white;
+    margin-top: 10px;
+    box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
 }
 
+/* Кнопка Telegram - более легкая */
 #tg {
-    background: #fef3c7; /* Светлое золото */
-    color: #92400e;
-    margin-top: -5px;
+    background-color: white;
+    color: var(--tg-blue);
+    border: 2px solid var(--tg-blue);
 }
 
 button:hover {
-    transform: scale(1.02);
-    filter: contrast(1.1);
+    transform: translateY(-3px);
 }
 
 #post:hover {
-    box-shadow: 0 8px 20px rgba(6, 95, 70, 0.3);
+    background: var(--hover-blue);
+    box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.5);
 }
 
 #tg:hover {
-    background: var(--accent-gold);
+    background: var(--tg-blue);
+    color: white;
 }
 
 button:active {
-    transform: scale(0.97);
+    transform: translateY(-1px) scale(0.98);
 }
 
 textarea {
-    min-height: 100px;
-    resize: none; /* Убираем ручное изменение размера для чистоты вида */
+    resize: none;
+    min-height: 120px;
 }
