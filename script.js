@@ -1,28 +1,40 @@
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+const form = document.getElementById("form");
 
-  try {
-    // Читаем данные. Если Vercel прислал строку, превращаем в объект
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    const { name, text } = body;
+form.addEventListener("submit", async function(event) {
+    event.preventDefault();
+    
+    // 1. Собираем данные
+    const formData = {
+        name: this.name.value,
+        text: this.text.value
+    };
 
-    const TOKEN = process.env.TG_TOKEN;
-    const CHAT_ID = process.env.TG_CHAT_ID;
+    console.log("Отправка данных...", formData);
 
-    // Прямой запрос к API Telegram
-    const response = await fetch(`https://api.telegram.org{TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: `👤 От: ${name}\n📝 Текст: ${text}`
-      })
-    });
+    try {
+        // 2. Делаем запрос к твоему серверу на Vercel
+        const response = await fetch("/api/send-message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
 
-    const result = await response.json();
-    return res.status(200).json(result);
-  } catch (err) {
-    // Если fetch failed, мы увидим причину в алерте на сайте
-    return res.status(500).json({ ok: false, error: err.message });
-  }
-}
+        // 3. Ждем ответ от сервера
+        const result = await response.json();
+        console.log("Ответ сервера:", result);
+
+        if (result.ok) {
+            // ТОЛЬКО ЕСЛИ ВСЁ ОТПРАВЛЕНО
+            alert("✅ Сообщение доставлено в Telegram!");
+            form.reset(); 
+        } else {
+            // Если Telegram вернул ошибку (например, неверный ID или токен)
+            alert("❌ Ошибка Telegram: " + (result.description || "проверьте токен"));
+        }
+
+    } catch (error) {
+        // Если вообще не удалось достучаться до сервера
+        console.error(error);
+        alert("🚨 Критическая ошибка: проверьте соединение или Vercel Logs");
+    }
+});
