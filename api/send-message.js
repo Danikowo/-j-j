@@ -1,27 +1,33 @@
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ ok: false, description: "Method Not Allowed" });
+  try {
+    // Vercel иногда присылает данные уже как объект, а иногда как строку
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { name, text } = body;
+
+    const TOKEN = process.env.TG_TOKEN;
+    const CHAT_ID = process.env.TG_CHAT_ID;
+
+    // Ссылка на отправку (проверь, чтобы были ` эти кавычки)
+    const url = `https://api.telegram.org{TOKEN}/sendMessage`;
+    
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: `🔔 Отзыв от: ${name}\n📝 Текст: ${text}`,
+      }),
+    });
+
+    const data = await response.json();
+    
+    if (data.ok) {
+        return res.status(200).json({ ok: true });
+    } else {
+        // Если Телеграм вернул ошибку (например, токен неверный)
+        return res.status(400).json({ ok: false, description: data.description });
     }
-
-    try {
-        const { name, text } = req.body;
-        const TOKEN = process.env.TG_TOKEN;
-        const CHAT_ID = process.env.TG_CHAT_ID;
-
-        const url = `https://api.telegram.org{TOKEN}/sendMessage`;
-        
-        const response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                chat_id: CHAT_ID,
-                text: `🔔 Новый отзыв!\n👤 От: ${name}\n📝 Текст: ${text}`,
-            }),
-        });
-
-        const data = await response.json();
-        res.status(200).json(data);
-    } catch (error) {
-        res.status(500).json({ ok: false, error: error.message });
-    }
+  } catch (error) {
+    return res.status(500).json({ ok: false, description: "Ошибка на сервере Vercel" });
+  }
 }
