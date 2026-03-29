@@ -1,76 +1,95 @@
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --tg-color: #229ED9;
+    --input-bg: rgba(255, 255, 255, 0.9);
+}
+
 .form-container {
-	max-width: 400px;
-	margin: 40px auto;
-	padding: 25px;
-	background-color: #f9f9f9;
-	border-radius: 12px;
-	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 420px;
+    margin: 60px auto;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 24px;
+    /* Глубокая мягкая тень */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    font-family: 'Inter', -apple-system, sans-serif;
 }
 
 h1 {
-	text-align: center;
-	color: #333;
-	margin-bottom: 20px;
-	font-size: 24px;
+    text-align: center;
+    color: #1a1a1a;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
 }
 
 #form {
-	display: flex;
-	flex-direction: column;
-	gap: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 label {
-	font-weight: 600;
-	color: #555;
-	margin-bottom: -10px;
-	font-size: 14px;
+    font-weight: 600;
+    color: #4a4a4a;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 4px;
 }
 
 input,
 textarea {
-	width: 100%;
-	padding: 12px;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	font-size: 16px;
-	box-sizing: border-box; /* Чтобы padding не раздувал ширину */
-	transition: border-color 0.3s ease;
+    width: 100%;
+    padding: 14px 18px;
+    background: var(--input-bg);
+    border: 2px solid #f0f0f0;
+    border-radius: 12px;
+    font-size: 16px;
+    color: #333;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 input:focus,
 textarea:focus {
-	outline: none;
-	border-color: #007bff;
+    outline: none;
+    border-color: #667eea;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
 }
-textarea {
-	resize: vertical;
-}
+
 button {
-	padding: 12px;
-	border: none;
-	border-radius: 8px;
-	font-size: 16px;
-	font-weight: bold;
-	cursor: pointer;
-	transition:
-		transform 0.1s,
-		opacity 0.3s;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
-button:active {
-	transform: scale(0.98);
-}
+
 #post {
-	background-color: #007bff;
-	color: white;
-	margin-top: 5px;
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
+
 #tg {
-	background-color: #2eb9ff;
-	color: white;
+    background-color: #f0f9ff;
+    color: var(--tg-color);
+    border: 1px solid rgba(34, 158, 217, 0.2);
 }
 
 button:hover {
-	opacity: 0.9;
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+button:active {
+    transform: translateY(0);
 }
