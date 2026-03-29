@@ -1,26 +1,27 @@
 export default async function handler(req, res) {
-  try {
-    const { name, text } = JSON.parse(req.body);
-    const TOKEN = process.env.TG_TOKEN;
-    const CHAT_ID = process.env.TG_CHAT_ID;
+    if (req.method !== 'POST') {
+        return res.status(405).json({ ok: false, description: "Method Not Allowed" });
+    }
 
-    // Исправленный URL: добавили /bot и знак $
-    const url = `https://api.telegram.org{TOKEN}/sendMessage`;
-    
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: `Отзыв от ${name}\n${text}`,
-      }),
-    });
+    try {
+        const { name, text } = req.body;
+        const TOKEN = process.env.TG_TOKEN;
+        const CHAT_ID = process.env.TG_CHAT_ID;
 
-    const data = await response.json();
-    res.status(200).json(data); // Возвращаем ответ от Телеграма (там будет ok: true)
-    
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ ok: false, error: "Ошибка на сервере" });
-  }
+        const url = `https://api.telegram.org{TOKEN}/sendMessage`;
+        
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: `🔔 Новый отзыв!\n👤 От: ${name}\n📝 Текст: ${text}`,
+            }),
+        });
+
+        const data = await response.json();
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ ok: false, error: error.message });
+    }
 }
