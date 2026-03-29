@@ -1,30 +1,28 @@
-const form = document.getElementById("form");
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-form.addEventListener("submit", async function(event) {
-    event.preventDefault();
+  try {
+    // Читаем данные. Если Vercel прислал строку, превращаем в объект
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { name, text } = body;
 
-    // Данные из полей формы
-    const formData = {
-        name: this.name.value,
-        text: this.text.value
-    };
+    const TOKEN = process.env.TG_TOKEN;
+    const CHAT_ID = process.env.TG_CHAT_ID;
 
-    try {
-        const response = await fetch("/api/send-message", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
-        });
+    // Прямой запрос к API Telegram
+    const response = await fetch(`https://api.telegram.org{TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: `👤 От: ${name}\n📝 Текст: ${text}`
+      })
+    });
 
-        const result = await response.json();
-
-        if (result.ok) {
-            alert("Отзыв успешно отправлен в Telegram!");
-            form.reset();
-        } else {
-            alert("Ошибка сервера: " + (result.description || "Неизвестная ошибка"));
-        }
-    } catch (error) {
-        alert("Ошибка сети. Проверьте соединение или настройки Vercel.");
-    }
-});
+    const result = await response.json();
+    return res.status(200).json(result);
+  } catch (err) {
+    // Если fetch failed, мы увидим причину в алерте на сайте
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+}
