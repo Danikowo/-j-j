@@ -3,7 +3,9 @@ const https = require('https');
 export default function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-    const { name, text } = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const body = (typeof req.body === 'string') ? JSON.parse(req.body) : req.body;
+    const name = body.name || "Аноним";
+    const text = body.text || "Пустой отзыв";
     const TOKEN = process.env.TG_TOKEN;
     const CHAT_ID = process.env.TG_CHAT_ID;
 
