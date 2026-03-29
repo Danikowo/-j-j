@@ -3,24 +3,21 @@ const https = require('https');
 export default function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-    // Пробуем достать данные всеми способами
     let body = req.body;
     if (typeof body === 'string') {
         try { body = JSON.parse(body); } catch(e) { body = {}; }
     }
 
-    const name = body.name || "Не указано";
-    const text = body.text || "Текст отсутствует";
+    // ТУТ ГЛАВНОЕ ИЗМЕНЕНИЕ:
+    const name = "Аноним"; 
+    const text = body.text || "Пустое сообщение";
 
     const TOKEN = process.env.TG_TOKEN;
     const CHAT_ID = process.env.TG_CHAT_ID;
 
-    // Формируем текст для Telegram
-    const message = `🔔 Новый отзыв!\n👤 От: ${name}\n📝 Текст: ${text}`;
-
     const data = JSON.stringify({
         chat_id: CHAT_ID,
-        text: message
+        text: `👤 От: ${name}\n📝 Текст: ${text}`
     });
 
     const options = {
