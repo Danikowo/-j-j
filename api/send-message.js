@@ -3,15 +3,24 @@ const https = require('https');
 export default function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-    const body = (typeof req.body === 'string') ? JSON.parse(req.body) : req.body;
-    const name = body.name || "Аноним";
-    const text = body.text || "Пустой отзыв";
+    // Пробуем достать данные всеми способами
+    let body = req.body;
+    if (typeof body === 'string') {
+        try { body = JSON.parse(body); } catch(e) { body = {}; }
+    }
+
+    const name = body.name || "Не указано";
+    const text = body.text || "Текст отсутствует";
+
     const TOKEN = process.env.TG_TOKEN;
     const CHAT_ID = process.env.TG_CHAT_ID;
 
+    // Формируем текст для Telegram
+    const message = `🔔 Новый отзыв!\n👤 От: ${name}\n📝 Текст: ${text}`;
+
     const data = JSON.stringify({
         chat_id: CHAT_ID,
-        text: `🔔 Отзыв от: ${name}\n📝 Текст: ${text}`
+        text: message
     });
 
     const options = {
@@ -21,7 +30,7 @@ export default function handler(req, res) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Content-Length': data.length
+            'Content-Length': Buffer.byteLength(data)
         }
     };
 
