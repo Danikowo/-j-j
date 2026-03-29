@@ -1,34 +1,25 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
-		<link rel="stylesheet" href="style.css" />
-	</head>
-	<body>
-		<div class="form-container">
-    <h1>Оставить отзыв</h1>
-    <!-- Убрали action, чтобы работал наш script.js -->
-    <form id="form">
-        <label for="name">Имя:</label>
-        <input name="name" id="name" required placeholder="Ваше Имя" />
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отзывы в ТГ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Оставить отзыв</h1>
+        <form id="form">
+            <label for="name">Имя:</label>
+            <input name="name" id="name" required placeholder="Ваше Имя">
 
-        <label for="text">Текст отзыва:</label>
-        <textarea
-            name="text"
-            id="text"
-            rows="5"
-            required
-            placeholder="Напишите ваш отзыв..."
-        ></textarea>
+            <label for="text">Текст отзыва:</label>
+            <textarea name="text" id="text" rows="5" required placeholder="Напишите ваш отзыв..."></textarea>
 
-        <!-- Кнопка для ТГ -->
-        <button type="submit" id="tg">Отправить в ТГ</button>
-    </form>
-</div>
+            <button type="submit" id="tg">Отправить в ТГ</button>
+        </form>
+    </div>
 
-
-		<script src="script.js"></script>
-	</body>
+    <script src="script.js"></script>
+</body>
 </html>
