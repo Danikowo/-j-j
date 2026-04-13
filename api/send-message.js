@@ -37,7 +37,8 @@ export default async function handler(req) {
     }
 
     // ИСПРАВЛЕННЫЙ URL: api.telegram.org + /bot + ${переменная}
-    const url = `https://telegram.org{TOKEN}/${method}`;
+ const url = `https://telegram.org{TOKEN}/${method}`;
+
 
     const response = await fetch(url, {
       method: 'POST',
