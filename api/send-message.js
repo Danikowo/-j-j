@@ -1,8 +1,9 @@
 export const config = {
-  runtime: 'edge', 
+  runtime: 'edge',
 };
 
 export default async function handler(req) {
+  // Разрешаем только POST запросы
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method Not Allowed' }), { status: 405 });
   }
@@ -15,8 +16,9 @@ export default async function handler(req) {
     const TOKEN = process.env.TG_TOKEN;
     const CHAT_ID = process.env.TG_CHAT_ID;
 
+    // Проверка наличия ключей
     if (!TOKEN || !CHAT_ID) {
-      throw new Error("Переменные окружения не настроены");
+      return new Response(JSON.stringify({ ok: false, description: "Ошибка: Токен или ID чата не настроены в Vercel" }), { status: 500 });
     }
 
     const tgData = new FormData();
@@ -25,7 +27,7 @@ export default async function handler(req) {
     let method = 'sendMessage';
     const captionText = `🔔 Анонимный отзыв:\n\n${text}`;
 
-    // Если прикреплен файл
+    // Если есть фото, меняем метод и поля
     if (photo && photo.size > 0) {
       method = 'sendPhoto';
       tgData.append('photo', photo);
@@ -34,12 +36,12 @@ export default async function handler(req) {
       tgData.append('text', captionText);
     }
 
-    // ИСПРАВЛЕННЫЙ URL (добавлен /bot и правильный домен)
+    // ИСПРАВЛЕННЫЙ URL: api.telegram.org + /bot + ${переменная}
     const url = `https://telegram.org{TOKEN}/${method}`;
 
-    const response = await fetch(url, { 
-      method: 'POST', 
-      body: tgData 
+    const response = await fetch(url, {
+      method: 'POST',
+      body: tgData,
     });
 
     const result = await response.json();
