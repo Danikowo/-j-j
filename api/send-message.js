@@ -15,10 +15,11 @@ export default async function handler(req, res) {
   form.parse(req, async (err, fields, files) => {
     if (err) return res.status(500).json({ ok: false, description: "Ошибка файлов" });
 
-    // Достаем данные (проверка на массивы для безопасности)
+    // Получаем данные (учитываем возможные массивы от formidable)
     const text = Array.isArray(fields.text) ? fields.text[0] : fields.text;
     const photo = Array.isArray(files.photo) ? files.photo[0] : files.photo;
 
+    // Берем секреты из настроек Vercel
     const TOKEN = process.env.TG_TOKEN;
     const CHAT_ID = process.env.TG_CHAT_ID;
 
@@ -27,7 +28,7 @@ export default async function handler(req, res) {
 
     let method = 'sendMessage';
 
-    // Если есть фото, меняем метод и добавляем файл
+    // Проверяем наличие фото
     if (photo && photo.filepath && photo.size > 0) {
       method = 'sendPhoto';
       tgFormData.append('photo', fs.createReadStream(photo.filepath));
@@ -37,8 +38,8 @@ export default async function handler(req, res) {
     }
 
     try {
-      // ИСПРАВЛЕННЫЙ URL (через обратные кавычки и $)
-      const url = `https://telegram.org{TOKEN}/${method}`;
+      // Прямая склейка URL без использования ${} для надежности на телефоне
+      const url = "https://telegram.org" + TOKEN + "/" + method;
       
       const response = await fetch(url, {
         method: 'POST',
@@ -49,7 +50,7 @@ export default async function handler(req, res) {
       const result = await response.json();
       res.status(200).json(result);
     } catch (error) {
-      res.status(500).json({ ok: false, description: "Ошибка связи: " + error.message });
+      res.status(500).json({ ok: false, description: "Ошибка: " + error.message });
     }
   });
 }
