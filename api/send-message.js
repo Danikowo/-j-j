@@ -42,17 +42,17 @@ export default async function handler(req, res) {
       tgFormData.append('text', `🔔 Анонимный отзыв:\n\n${text || 'Без текста'}`);
     }
 
-    try {
-      const response = await fetch(`https://telegram.org{TOKEN}/${method}`, {
+       try {
+      const TOKEN = process.env.TG_TOKEN;
+      const CHAT_ID = process.env.TG_CHAT_ID;
+      
+      const url = "https://telegram.org" + TOKEN + "/" + method;
+      
+      const response = await fetch(url, {
         method: 'POST',
         body: tgFormData,
         headers: tgFormData.getHeaders(),
       });
+      // ... остальной код
 
-      const result = await response.json();
-      res.status(200).json(result);
-    } catch (error) {
-      res.status(500).json({ ok: false, description: "Ошибка связи: " + error.message });
-    }
-  });
 }
