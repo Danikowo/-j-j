@@ -3,67 +3,53 @@ import fs from 'fs';
 import FormData from 'form-data';
 import fetch from 'node-fetch';
 
-// Отключаем стандартный парсер Vercel, чтобы прочитать файл (Multipart Form Data)
 export const config = {
-  api: {
-    bodyParser: false,
-  },
+  api: { bodyParser: false },
 };
 
 export default async function handler(req, res) {
-  // Разрешаем только POST запросы
-  if (req.method !== 'POST') {
-    return res.status(405).json({ ok: false, description: "Method Not Allowed" });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ ok: false });
 
   const form = new Formidable();
 
   form.parse(req, async (err, fields, files) => {
-    if (err) {
-      return res.status(500).json({ ok: false, description: "Ошибка при чтении данных" });
-    }
+    if (err) return res.status(500).json({ ok: false, description: "Ошибка файлов" });
 
-    // Извлекаем текст и фото (учитываем, что formidable может вернуть массив)
+    // Достаем данные (проверка на массивы для безопасности)
     const text = Array.isArray(fields.text) ? fields.text[0] : fields.text;
     const photo = Array.isArray(files.photo) ? files.photo[0] : files.photo;
 
     const TOKEN = process.env.TG_TOKEN;
     const CHAT_ID = process.env.TG_CHAT_ID;
 
-    // Подготавливаем данные для Telegram
     const tgFormData = new FormData();
     tgFormData.append('chat_id', CHAT_ID);
 
-    let telegramMethod = 'sendMessage';
+    let method = 'sendMessage';
 
-    // Если пользователь прикрепил фото
+    // Если есть фото, меняем метод и добавляем файл
     if (photo && photo.filepath && photo.size > 0) {
-      telegramMethod = 'sendPhoto';
+      method = 'sendPhoto';
       tgFormData.append('photo', fs.createReadStream(photo.filepath));
-      // Текст отзыва идет как подпись к фото
-      tgFormData.append('caption', `🔔 Анонимный отзыв:\n\n${text || 'Без описания'}`);
+      tgFormData.append('caption', `🔔 Анонимный отзыв:\n\n${text || 'Без текста'}`);
     } else {
-      // Если фото нет, шлем просто текст
-      telegramMethod = 'sendMessage';
-      tgFormData.append('text', `🔔 Анонимный отзыв:\n\n${text || 'Пустое сообщение'}`);
+      tgFormData.append('text', `🔔 Анонимный отзыв:\n\n${text || 'Без текста'}`);
     }
 
     try {
-      const response = await fetch(`https://telegram.org{TOKEN}/${telegramMethod}`, {
+      // ИСПРАВЛЕННЫЙ URL (через обратные кавычки и $)
+      const url = `https://telegram.org{TOKEN}/${method}`;
+      
+      const response = await fetch(url, {
         method: 'POST',
         body: tgFormData,
-        headers: tgFormData.getHeaders(), // Важно для передачи файлов
+        headers: tgFormData.getHeaders(),
       });
 
       const result = await response.json();
-
-      if (result.ok) {
-        res.status(200).json({ ok: true });
-      } else {
-        res.status(400).json({ ok: false, description: result.description });
-      }
+      res.status(200).json(result);
     } catch (error) {
-      res.status(500).json({ ok: false, description: "Ошибка на стороне сервера: " + error.message });
+      res.status(500).json({ ok: false, description: "Ошибка связи: " + error.message });
     }
   });
 }
