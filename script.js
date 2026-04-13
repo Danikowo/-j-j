@@ -64,3 +64,31 @@ themeToggle.addEventListener("click", () => {
     // 3. Сохраняем выбор пользователя
     localStorage.setItem("theme", theme);
 });
+const form = document.getElementById("form");
+
+form.addEventListener("submit", async function(event) {
+    event.preventDefault();
+    
+    // Создаем объект FormData (он сам соберет текст и файл)
+    const formData = new FormData();
+    formData.append("text", document.getElementById("text").value);
+    formData.append("photo", document.getElementById("photo").files[0]); // Берем файл
+
+    try {
+        const response = await fetch("/api/send-message", {
+            method: "POST",
+            // Заголовок Content-Type ставить НЕ НУЖНО, браузер сделает это сам
+            body: formData 
+        });
+
+        const result = await response.json();
+        if (result.ok) {
+            alert("✅ Отправлено с фото!");
+            form.reset();
+        } else {
+            alert("❌ Ошибка: " + result.description);
+        }
+    } catch (error) {
+        alert("🚨 Ошибка сети");
+    }
+});
