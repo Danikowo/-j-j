@@ -1,19 +1,19 @@
 // --- ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ТЕМЫ ---
 const themeToggle = document.getElementById("theme-toggle");
 
-// Функция для обновления иконки кнопки
 const updateThemeIcon = () => {
     const isLight = document.documentElement.classList.contains("light-theme");
     themeToggle.textContent = isLight ? "☀️" : "🌙";
 };
 
-// ЧИТАЕМ СОХРАНЕННУЮ ТЕМУ ПРИ ЗАГРУЗКЕ
+// 1. При загрузке проверяем сохраненную тему
 const savedTheme = localStorage.getItem("theme");
 if (savedTheme === "light") {
     document.documentElement.classList.add("light-theme");
 }
 updateThemeIcon();
 
+// 2. Переключение по клику
 themeToggle.addEventListener("click", () => {
     document.documentElement.classList.toggle("light-theme");
     const isLight = document.documentElement.classList.contains("light-theme");
@@ -31,6 +31,7 @@ form.addEventListener("submit", async function(event) {
     const textInput = document.getElementById("text");
     const photoInput = document.getElementById("photo");
 
+    // Блокируем кнопку
     submitBtn.disabled = true;
     submitBtn.textContent = "ОТПРАВКА...";
 
@@ -47,23 +48,18 @@ form.addEventListener("submit", async function(event) {
             body: formData
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.description || "Ошибка сервера");
-        }
-
         const result = await response.json();
 
-        if (result.ok) {
-            alert("✅ Успешно отправлено!");
+        if (response.ok && result.ok) {
+            alert("✅ Успешно отправлено в Telegram!");
             form.reset();
         } else {
-            alert("❌ Ошибка Telegram: " + (result.description || "неизвестно"));
+            alert("❌ Ошибка: " + (result.description || "Неизвестная ошибка сервера"));
         }
 
     } catch (error) {
-        console.error("Ошибка:", error);
-        alert("🚨 " + error.message);
+        console.error("Ошибка при отправке:", error);
+        alert("🚨 Ошибка сети: проверьте соединение или размер файла");
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = "ОТПРАВИТЬ В ГРУППУ";
