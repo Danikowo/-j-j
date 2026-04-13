@@ -16,29 +16,33 @@ export default async function handler(req) {
     const CHAT_ID = process.env.TG_CHAT_ID;
 
     if (!TOKEN || !CHAT_ID) {
-      return new Response(JSON.stringify({ ok: false, description: "Ошибка: Переменные окружения не настроены" }), { status: 500 });
+      return new Response(JSON.stringify({ ok: false, description: "Настройки Vercel пустые (TG_TOKEN/CHAT_ID)" }), { status: 500 });
     }
 
-    const tgData = new FormData();
-    tgData.append('chat_id', CHAT_ID);
+    const captionText = `🔔 Анонимный отзыв:\n\n${text}`;
+    
+    // Подготавливаем данные для Telegram
+    const tgFormData = new FormData();
+    tgFormData.append('chat_id', CHAT_ID);
 
     let method = 'sendMessage';
-    const captionText = `🔔 Анонимный отзыв:\n\n${text}`;
 
-    if (photo && photo.size > 0) {
+    // Проверяем наличие фото (объект должен иметь размер)
+    if (photo && typeof photo === 'object' && photo.size > 0) {
       method = 'sendPhoto';
-      tgData.append('photo', photo);
-      tgData.append('caption', captionText);
+      tgFormData.append('photo', photo); // Передаем сам объект файла
+      tgFormData.append('caption', captionText);
     } else {
-      tgData.append('text', captionText);
+      tgFormData.append('text', captionText);
     }
 
-    // ИСПРАВЛЕНО: Обратные кавычки, домен api. и префикс /bot
     const url = `https://telegram.org{TOKEN}/${method}`;
 
+    // Отправляем запрос
     const response = await fetch(url, {
       method: 'POST',
-      body: tgData,
+      body: tgFormData,
+      // Заголовки Content-Type ставить НЕЛЬЗЯ, fetch сам создаст boundary
     });
 
     const result = await response.json();
@@ -49,7 +53,10 @@ export default async function handler(req) {
     });
 
   } catch (error) {
-    return new Response(JSON.stringify({ ok: false, description: error.message }), { 
+    return new Response(JSON.stringify({ 
+      ok: false, 
+      description: "Ошибка сервера: " + error.message 
+    }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
