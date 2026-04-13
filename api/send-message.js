@@ -1,54 +1,24 @@
-export const config = {
-  runtime: 'edge',
-};
+import Busboy from 'busboy';
 
-export default async function handler(req) {
-  if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
+export const config = { api: { bodyParser: false } };
 
-  try {
-    const formData = await req.formData();
-    const text = formData.get('text') || 'Без текста';
-    const photo = formData.get('photo');
+export default function handler(req, res) {
+  const TOKEN = process.env.TG_TOKEN;
+  const CHAT_ID = process.env.TG_CHAT_ID;
+  const busboy = Busboy({ headers: req.headers });
+  const formData = new URLSearchParams();
+  formData.append('chat_id', CHAT_ID);
 
-    // ВАЖНО: В режиме Edge переменные берутся напрямую из process.env
-    const TOKEN = process.env.TG_TOKEN;
-    const CHAT_ID = process.env.TG_CHAT_ID;
+  let hasFile = false;
 
-    if (!TOKEN || !CHAT_ID) {
-      return new Response(JSON.stringify({ ok: false, description: "Токен или ID не найдены в настройках Vercel" }), { status: 500 });
-    }
+  busboy.on('field', (name, val) => {
+    if (name === 'text') formData.append('caption', `🔔 Отзыв:\n${val}`);
+  });
 
-    const tgData = new FormData();
-    tgData.append('chat_id', CHAT_ID);
+  busboy.on('file', (name, file, info) => {
+    hasFile = true;
+    const { filename, mimeType } = info;
+    // Здесь сложная логика пересылки потока... 
+  });
 
-    let method = 'sendMessage';
-
-    if (photo && photo.size > 0) {
-      method = 'sendPhoto';
-      tgData.append('photo', photo);
-      tgData.append('caption', `🔔 Анонимный отзыв:\n\n${text}`);
-    } else {
-      method = 'sendMessage';
-      tgData.append('text', `🔔 Анонимный отзыв:\n\n${text}`);
-    }
-
-    // ИСПРАВЛЕННЫЙ URL (без фигурных скобок, просто склейка)
-    const url = "https://telegram.org" + TOKEN + "/" + method;
-
-    const response = await fetch(url, {
-      method: 'POST',
-      body: tgData,
-    });
-
-    const result = await response.json();
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-  } catch (error) {
-    return new Response(JSON.stringify({ ok: false, description: error.message }), {
-      status: 500,
-    });
-  }
-}
+  // ДАВАЙ УПРОСТИМ ДО ПРЕДЕЛА.
