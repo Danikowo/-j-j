@@ -53,9 +53,14 @@ form.addEventListener("submit", async function(event) {
         } else {
             alert("❌ Ошибка: " + (result.description || "Не удалось отправить"));
         }
-    } catch (error) {
+      } catch (error) {
         console.error(error);
-        alert("🚨 Ошибка сети. Проверьте размер фото или Vercel Logs.");
+        alert("🚨 Ошибка: " + error.message); // Теперь покажет точную причину
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "ОТПРАВИТЬ В ГРУППУ";
+    }
+
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = "Отправить в группу";
