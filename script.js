@@ -7,7 +7,11 @@ const updateThemeIcon = () => {
     themeToggle.textContent = isLight ? "☀️" : "🌙";
 };
 
-// Вызываем один раз при загрузке
+// ЧИТАЕМ СОХРАНЕННУЮ ТЕМУ ПРИ ЗАГРУЗКЕ
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme === "light") {
+    document.documentElement.classList.add("light-theme");
+}
 updateThemeIcon();
 
 themeToggle.addEventListener("click", () => {
@@ -27,48 +31,40 @@ form.addEventListener("submit", async function(event) {
     const textInput = document.getElementById("text");
     const photoInput = document.getElementById("photo");
 
-    // Блокируем кнопку, чтобы избежать повторных нажатий
     submitBtn.disabled = true;
     submitBtn.textContent = "ОТПРАВКА...";
 
-    // Создаем объект FormData для отправки данных (текст + файл)
     const formData = new FormData();
     formData.append("text", textInput.value);
     
-    // ВАЖНО: Берем именно ПЕРВЫЙ файл из списка выбранных [0]
     if (photoInput.files && photoInput.files[0]) {
         formData.append("photo", photoInput.files[0]);
     }
 
     try {
-        // Отправляем запрос на твой сервер Vercel
         const response = await fetch("/api/send-message", {
             method: "POST",
-            // Заголовки ставить НЕ НУЖНО, браузер сам настроит multipart/form-data
             body: formData
         });
 
-        // Проверяем, что сервер вообще ответил
         if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || "Ошибка сервера");
+            const errorData = await response.json();
+            throw new Error(errorData.description || "Ошибка сервера");
         }
 
         const result = await response.json();
 
         if (result.ok) {
-            alert("✅ Успешно отправлено в Telegram!");
-            form.reset(); // Очищаем форму
-            updateThemeIcon(); // Возвращаем иконку, если форма сбросилась
+            alert("✅ Успешно отправлено!");
+            form.reset();
         } else {
-            alert("❌ Ошибка Telegram: " + (result.description || "неизвестная ошибка"));
+            alert("❌ Ошибка Telegram: " + (result.description || "неизвестно"));
         }
 
     } catch (error) {
-        console.error("Ошибка при отправке:", error);
-        alert("🚨 Ошибка сети: файл слишком велик или сервер недоступен");
+        console.error("Ошибка:", error);
+        alert("🚨 " + error.message);
     } finally {
-        // Разблокируем кнопку в любом случае
         submitBtn.disabled = false;
         submitBtn.textContent = "ОТПРАВИТЬ В ГРУППУ";
     }
