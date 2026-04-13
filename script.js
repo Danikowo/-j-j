@@ -1,68 +1,59 @@
-// --- ЛОГИКА ТЕМЫ ---
-const themeToggle = document.getElementById("theme-toggle");
-
-// Функция обновления иконки
-const updateIcon = () => {
-    themeToggle.textContent = document.documentElement.classList.contains("light-theme") ? "☀️" : "🌙";
-};
-
-// Проверяем сохраненную тему при загрузке
-updateIcon();
-
-themeToggle.addEventListener("click", () => {
-    document.documentElement.classList.toggle("light-theme");
-    const isLight = document.documentElement.classList.contains("light-theme");
-    localStorage.setItem("theme", isLight ? "light" : "dark");
-    updateIcon();
-});
-
-// --- ЛОГИКА ОТПРАВКИ ФОРМЫ ---
 const form = document.getElementById("form");
 
 form.addEventListener("submit", async function(event) {
     event.preventDefault();
-
+    
+    const submitBtn = document.getElementById("tg");
     const textInput = document.getElementById("text");
     const photoInput = document.getElementById("photo");
-    const submitBtn = document.getElementById("tg");
 
-    // Блокируем кнопку, чтобы не нажали дважды
+    // Блокируем кнопку, чтобы видеть, что процесс пошел
     submitBtn.disabled = true;
-    submitBtn.textContent = "Отправка...";
+    submitBtn.textContent = "ЧИТАЮ ФАЙЛ...";
 
-    // Используем FormData для поддержки передачи файлов
+    // Создаем FormData
     const formData = new FormData();
     formData.append("text", textInput.value);
     
-    if (photoInput.files[0]) {
+    // Проверяем, выбрал ли пользователь файл
+    if (photoInput.files && photoInput.files[0]) {
         formData.append("photo", photoInput.files[0]);
+        console.log("Файл обнаружен:", photoInput.files[0].name);
     }
 
     try {
+        submitBtn.textContent = "ОТПРАВЛЯЮ...";
+        
         const response = await fetch("/api/send-message", {
             method: "POST",
             body: formData
-            // Заголовки Content-Type ставить не нужно, браузер сделает это сам
+            // Важно: заголовки НЕ СТАВИМ, браузер сам настроит multipart/form-data
         });
 
+        // Пытаемся прочитать ответ
         const result = await response.json();
+        console.log("Результат от сервера:", result);
 
         if (result.ok) {
-            alert("✅ Отправлено анонимно!");
+            alert("✅ Успешно отправлено в Telegram!");
             form.reset();
         } else {
-            alert("❌ Ошибка: " + (result.description || "Не удалось отправить"));
+            alert("❌ Ошибка от бота: " + (result.description || "неизвестно"));
         }
-      } catch (error) {
-        console.error(error);
-        alert("🚨 Ошибка: " + error.message); // Теперь покажет точную причину
+    } catch (error) {
+        console.error("Ошибка запроса:", error);
+        alert("🚨 Ошибка соединения. Возможно, файл слишком большой.");
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = "ОТПРАВИТЬ В ГРУППУ";
     }
+});
 
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Отправить в группу";
-    }
+// Логика темы (оставляем без изменений)
+const themeToggle = document.getElementById("theme-toggle");
+themeToggle.addEventListener("click", () => {
+    document.documentElement.classList.toggle("light-theme");
+    const isLight = document.documentElement.classList.contains("light-theme");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+    themeToggle.textContent = isLight ? "☀️" : "🌙";
 });
