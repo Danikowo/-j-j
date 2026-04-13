@@ -1,5 +1,5 @@
-export const config = {
-  runtime: 'edge', // Самый быстрый режим Vercel
+eexport const config = {
+  runtime: 'edge',
 };
 
 export default async function handler(req) {
@@ -10,8 +10,13 @@ export default async function handler(req) {
     const text = formData.get('text') || 'Без текста';
     const photo = formData.get('photo');
 
+    // ВАЖНО: В режиме Edge переменные берутся напрямую из process.env
     const TOKEN = process.env.TG_TOKEN;
     const CHAT_ID = process.env.TG_CHAT_ID;
+
+    if (!TOKEN || !CHAT_ID) {
+      return new Response(JSON.stringify({ ok: false, description: "Токен или ID не найдены в настройках Vercel" }), { status: 500 });
+    }
 
     const tgData = new FormData();
     tgData.append('chat_id', CHAT_ID);
@@ -23,10 +28,14 @@ export default async function handler(req) {
       tgData.append('photo', photo);
       tgData.append('caption', `🔔 Анонимный отзыв:\n\n${text}`);
     } else {
+      method = 'sendMessage';
       tgData.append('text', `🔔 Анонимный отзыв:\n\n${text}`);
     }
 
-    const response = await fetch(`https://telegram.org{TOKEN}/${method}`, {
+    // ИСПРАВЛЕННЫЙ URL (без фигурных скобок, просто склейка)
+    const url = "https://telegram.org" + TOKEN + "/" + method;
+
+    const response = await fetch(url, {
       method: 'POST',
       body: tgData,
     });
