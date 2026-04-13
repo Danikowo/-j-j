@@ -1,59 +1,45 @@
-import { Formidable } from 'formidable';
-import fs from 'fs';
-import FormData from 'form-data';
-import fetch from 'node-fetch';
-
 export const config = {
-  api: { bodyParser: false },
+  runtime: 'edge', // Самый быстрый режим Vercel
 };
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ ok: false });
+export default async function handler(req) {
+  if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
 
-  const form = new Formidable();
+  try {
+    const formData = await req.formData();
+    const text = formData.get('text') || 'Без текста';
+    const photo = formData.get('photo');
 
-  form.parse(req, async (err, fields, files) => {
-    try {
-      if (err) throw new Error("Ошибка чтения формы");
+    const TOKEN = process.env.TG_TOKEN;
+    const CHAT_ID = process.env.TG_CHAT_ID;
 
-      // Берем данные из Vercel
-      const TOKEN = process.env.TG_TOKEN;
-      const CHAT_ID = process.env.TG_CHAT_ID;
+    const tgData = new FormData();
+    tgData.append('chat_id', CHAT_ID);
 
-      // Извлекаем текст и файл (учитываем странности библиотеки formidable)
-      const rawText = Array.isArray(fields.text) ? fields.text[0] : fields.text;
-      const text = (rawText && rawText.trim()) ? rawText : "Пустое сообщение";
-      
-      const photo = Array.isArray(files.photo) ? files.photo[0] : files.photo;
+    let method = 'sendMessage';
 
-      const tgFormData = new FormData();
-      tgFormData.append('chat_id', CHAT_ID);
-
-      let method = 'sendMessage';
-
-      if (photo && photo.filepath && photo.size > 0) {
-        method = 'sendPhoto';
-        tgFormData.append('photo', fs.createReadStream(photo.filepath));
-        tgFormData.append('caption', `🔔 Анонимный отзыв:\n\n${text}`);
-      } else {
-        tgFormData.append('text', `🔔 Анонимный отзыв:\n\n${text}`);
-      }
-
-      const url = `https://telegram.org{TOKEN}/${method}`;
-      
-      const response = await fetch(url, {
-        method: 'POST',
-        body: tgFormData,
-        headers: tgFormData.getHeaders(),
-      });
-
-      const result = await response.json();
-      return res.status(200).json(result);
-
-    } catch (error) {
-      console.error(error);
-      // Возвращаем JSON даже при ошибке, чтобы script.js не ругался на "Invalid JSON"
-      return res.status(500).json({ ok: false, description: error.message });
+    if (photo && photo.size > 0) {
+      method = 'sendPhoto';
+      tgData.append('photo', photo);
+      tgData.append('caption', `🔔 Анонимный отзыв:\n\n${text}`);
+    } else {
+      tgData.append('text', `🔔 Анонимный отзыв:\n\n${text}`);
     }
-  });
+
+    const response = await fetch(`https://telegram.org{TOKEN}/${method}`, {
+      method: 'POST',
+      body: tgData,
+    });
+
+    const result = await response.json();
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+  } catch (error) {
+    return new Response(JSON.stringify({ ok: false, description: error.message }), {
+      status: 500,
+    });
+  }
 }
