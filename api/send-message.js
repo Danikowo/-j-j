@@ -15,20 +15,26 @@ export default async function handler(req, res) {
   form.parse(req, async (err, fields, files) => {
     if (err) return res.status(500).json({ ok: false, description: "Ошибка файлов" });
 
-    // Получаем данные (учитываем возможные массивы от formidable)
-    const text = Array.isArray(fields.text) ? fields.text[0] : fields.text;
-    const photo = Array.isArray(files.photo) ? files.photo[0] : files.photo;
-
-    // Берем секреты из настроек Vercel
+    // Берем данные из настроек Vercel
     const TOKEN = process.env.TG_TOKEN;
     const CHAT_ID = process.env.TG_CHAT_ID;
+
+    // ПРОВЕРКА: Если токен пустой, выдаем понятную ошибку
+    if (!TOKEN || TOKEN.includes('{')) {
+      return res.status(500).json({ 
+        ok: false, 
+        description: "ТОКЕН НЕ НАЙДЕН. Проверьте настройки Environment Variables в Vercel!" 
+      });
+    }
+
+    const text = Array.isArray(fields.text) ? fields.text[0] : fields.text;
+    const photo = Array.isArray(files.photo) ? files.photo[0] : files.photo;
 
     const tgFormData = new FormData();
     tgFormData.append('chat_id', CHAT_ID);
 
     let method = 'sendMessage';
 
-    // Проверяем наличие фото
     if (photo && photo.filepath && photo.size > 0) {
       method = 'sendPhoto';
       tgFormData.append('photo', fs.createReadStream(photo.filepath));
@@ -38,8 +44,8 @@ export default async function handler(req, res) {
     }
 
     try {
-      // Прямая склейка URL без использования ${} для надежности на телефоне
-      const url = "https://telegram.org" + TOKEN + "/" + method;
+      // Собираем URL максимально просто
+      const url = "https://telegram.org" + TOKEN.trim() + "/" + method;
       
       const response = await fetch(url, {
         method: 'POST',
@@ -50,7 +56,7 @@ export default async function handler(req, res) {
       const result = await response.json();
       res.status(200).json(result);
     } catch (error) {
-      res.status(500).json({ ok: false, description: "Ошибка: " + error.message });
+      res.status(500).json({ ok: false, description: "Ошибка URL или сети: " + error.message });
     }
   });
 }
