@@ -1,10 +1,9 @@
-export const config = {
-  runtime: 'edge',
-};
+export const config = { runtime: 'edge' };
 
 export default async function handler(req) {
+  // Разрешаем только POST
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method Not Allowed' }), { status: 405 });
+    return new Response(JSON.stringify({ ok: false, description: "Метод не разрешен" }), { status: 405 });
   }
 
   try {
@@ -15,49 +14,44 @@ export default async function handler(req) {
     const TOKEN = process.env.TG_TOKEN;
     const CHAT_ID = process.env.TG_CHAT_ID;
 
+    // Проверяем ключи. Если их нет, выводим ошибку как JSON
     if (!TOKEN || !CHAT_ID) {
-      return new Response(JSON.stringify({ ok: false, description: "Настройки Vercel пустые (TG_TOKEN/CHAT_ID)" }), { status: 500 });
+      return new Response(JSON.stringify({ ok: false, description: "Ключи TG_TOKEN или TG_CHAT_ID не настроены в Vercel" }), { status: 200 });
     }
 
-    const captionText = `🔔 Анонимный отзыв:\n\n${text}`;
-    
-    // Подготавливаем данные для Telegram
-    const tgFormData = new FormData();
-    tgFormData.append('chat_id', CHAT_ID);
+    const tgData = new FormData();
+    tgData.append('chat_id', CHAT_ID);
 
     let method = 'sendMessage';
+    const captionText = `🔔 Анонимный отзыв:\n\n${text}`;
 
-    // Проверяем наличие фото (объект должен иметь размер)
+    // Проверяем, пришло ли фото и является ли оно файлом
     if (photo && typeof photo === 'object' && photo.size > 0) {
       method = 'sendPhoto';
-      tgFormData.append('photo', photo); // Передаем сам объект файла
-      tgFormData.append('caption', captionText);
+      tgData.append('photo', photo);
+      tgData.append('caption', captionText);
     } else {
-      tgFormData.append('text', captionText);
+      tgData.append('text', captionText);
     }
 
-    const url = `https://telegram.org/bot${TOKEN}`;
+    const url = `https://telegram.org{TOKEN}/${method}`;
 
-    // Отправляем запрос
     const response = await fetch(url, {
       method: 'POST',
-      body: tgFormData,
-      // Заголовки Content-Type ставить НЕЛЬЗЯ, fetch сам создаст boundary
+      body: tgData
     });
 
     const result = await response.json();
 
     return new Response(JSON.stringify(result), {
-      status: response.status,
-      headers: { 'Content-Type': 'application/json' },
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
-    return new Response(JSON.stringify({ 
-      ok: false, 
-      description: "Ошибка сервера: " + error.message 
-    }), { 
-      status: 500,
+    // Вместо 500 возвращаем 200 с описанием ошибки, чтобы ты увидел её в alert
+    return new Response(JSON.stringify({ ok: false, description: "Ошибка сервера: " + error.message }), { 
+      status: 200, 
       headers: { 'Content-Type': 'application/json' }
     });
   }
