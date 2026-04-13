@@ -44,8 +44,15 @@ form.addEventListener("submit", async function(event) {
 
     try {
         const response = await fetch("/api/send-message", {
-            method: "POST",
-            body: formData
+    method: "POST",
+    body: formData
+});
+
+// Если сервер вернул ошибку, сначала читаем её как текст
+if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Ответ сервера:", errorText);
+    throw new Error("Сервер вернул ошибку. Проверь логи в панели Vercel.");
         });
 
         const result = await response.json();
