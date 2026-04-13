@@ -15,17 +15,10 @@ export default async function handler(req, res) {
   form.parse(req, async (err, fields, files) => {
     if (err) return res.status(500).json({ ok: false, description: "Ошибка файлов" });
 
-    // Берем данные из настроек Vercel
-    const TOKEN = process.env.TG_TOKEN;
-    const CHAT_ID = process.env.TG_CHAT_ID;
-
-    // ПРОВЕРКА: Если токен пустой, выдаем понятную ошибку
-    if (!TOKEN || TOKEN.includes('{')) {
-      return res.status(500).json({ 
-        ok: false, 
-        description: "ТОКЕН НЕ НАЙДЕН. Проверьте настройки Environment Variables в Vercel!" 
-      });
-    }
+    // --- ВСТАВЬ СВОИ ДАННЫЕ СЮДА ---
+    const TOKEN = "8795571337:AAESgBTvz4S1hg8iagCb77qLMX05vOkwuBQ"; // Твой токен
+    const CHAT_ID = "5502948313"; // Твой ID (или ID группы с минусом)
+    // ------------------------------
 
     const text = Array.isArray(fields.text) ? fields.text[0] : fields.text;
     const photo = Array.isArray(files.photo) ? files.photo[0] : files.photo;
@@ -44,8 +37,8 @@ export default async function handler(req, res) {
     }
 
     try {
-      // Собираем URL максимально просто
-      const url = "https://telegram.org" + TOKEN.trim() + "/" + method;
+      // Прямая ссылка без лишних символов
+      const url = `https://telegram.org{TOKEN}/${method}`;
       
       const response = await fetch(url, {
         method: 'POST',
@@ -56,7 +49,7 @@ export default async function handler(req, res) {
       const result = await response.json();
       res.status(200).json(result);
     } catch (error) {
-      res.status(500).json({ ok: false, description: "Ошибка URL или сети: " + error.message });
+      res.status(500).json({ ok: false, description: "Ошибка отправки: " + error.message });
     }
   });
 }
