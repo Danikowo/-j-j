@@ -5,7 +5,11 @@ form.addEventListener("submit", async function(event) {
     const btn = document.getElementById("tg");
     
     // Собираем данные формы напрямую
-    const formData.append("photo", photoInput.files[0]);
+  if (photoInput.files && photoInput.files[0]) {
+    // Обязательно добавь [0] в конце!
+    formData.append("photo", photoInput.files[0]);
+}
+
 
     btn.disabled = true;
     btn.textContent = "ОТПРАВКА...";
