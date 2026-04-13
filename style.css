@@ -1,4 +1,31 @@
+/* ПЕРЕМЕННЫЕ ЦВЕТОВ В RGB */
+:root {
+    /* Темная тема (по умолчанию) */
+    --bg-page: rgb(15, 23, 42);           
+    --bg-form: rgb(30, 41, 59);           
+    --text-main: rgb(248, 250, 252);         
+    --text-label: rgb(59, 130, 246);        
+    --input-bg: rgb(51, 65, 85);          
+    --primary-blue: rgb(59, 130, 246);      
+    --hover-blue: rgb(37, 99, 235);
+    --tg-blue: rgb(0, 136, 204);
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --border-color: rgb(51, 65, 85);
+}
 
+/* Светлая тема */
+body.light-theme {
+    --bg-page: rgb(255, 255, 255);
+    --bg-form: rgb(255, 255, 255);
+    --text-main: rgb(30, 41, 59);
+    --text-label: rgb(37, 99, 235);        
+    --input-bg: rgb(239, 246, 255);          
+    --primary-blue: rgb(37, 99, 235);
+    --hover-blue: rgb(29, 78, 216);
+    --tg-blue: rgb(0, 136, 204);
+    --shadow-color: rgba(37, 99, 235, 0.15);
+    --border-color: rgb(226, 232, 240);
+}
 
 /* ОБЩИЕ СТИЛИ */
 body {
@@ -8,10 +35,29 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    transition: background-color 0.3s ease; /* Плавный переход */
+    transition: background-color 0.3s ease;
 }
 
-
+#theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 12px;
+    background: var(--bg-form);
+    color: var(--text-main);
+    border: 2px solid var(--primary-blue);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transition: all 0.3s ease;
+}
 
 #theme-toggle:hover {
     transform: scale(1.1);
@@ -72,7 +118,8 @@ textarea:focus {
     outline: none;
     background: var(--bg-form);
     border-color: var(--primary-blue);
-    box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.1);
+    /* Здесь тоже RGBA для мягкого свечения */
+    box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.1); 
 }
 
 button {
@@ -89,8 +136,9 @@ button {
 
 /* Кнопка POST (Синяя) */
 #post {
-    background: linear-gradient(135deg, var(--primary-blue), #3b82f6);
-    color: white;
+    /* Градиент на RGB */
+    background: linear-gradient(135deg, var(--primary-blue), rgb(59, 130, 246));
+    color: rgb(255, 255, 255);
     margin-top: 10px;
     box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
 }
@@ -113,7 +161,7 @@ button:hover {
 
 #tg:hover {
     background: var(--tg-blue);
-    color: white;
+    color: rgb(255, 255, 255);
 }
 
 button:active {
@@ -124,4 +172,3 @@ textarea {
     resize: none;
     min-height: 120px;
 }
-
