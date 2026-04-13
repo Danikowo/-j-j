@@ -1,31 +1,4 @@
-:/* ПЕРЕМЕННЫЕ ЦВЕТОВ */
-:root {
-    /* Темная тема (по умолчанию) */
-    --bg-page: #0f172a;           /* Глубокий темный фон */
-    --bg-form: #1e293b;           /* Темно-синяя форма */
-    --text-main: #f8fafc;         /* Белый текст */
-    --text-label: #3b82f6;        /* Синий для подписей */
-    --input-bg: #334155;          /* Темный фон инпутов */
-    --primary-blue: #3b82f6;      
-    --hover-blue: #2563eb;
-    --tg-blue: #0088cc;
-    --shadow-color: rgba(0, 0, 0, 0.4);
-    --border-color: #334155;
-}
 
-/* Светлая тема (активируется через JS) */
-body.light-theme {
-    --bg-page: #ffffff;
-    --bg-form: #ffffff;
-    --text-main: #1e293b;
-    --text-label: #2563eb;        /* Твой насыщенный синий */
-    --input-bg: #eff6ff;          /* Твой нежно-голубой */
-    --primary-blue: #2563eb;
-    --hover-blue: #1d4ed8;
-    --tg-blue: #0088cc;
-    --shadow-color: rgba(37, 99, 235, 0.15);
-    --border-color: #e2e8f0;
-}
 
 /* ОБЩИЕ СТИЛИ */
 body {
