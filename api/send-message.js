@@ -23,7 +23,7 @@ export default async function handler(req) {
     tgData.append('chat_id', CHAT_ID);
 
     let method = 'sendMessage';
-    const captionText = `🔔 Анонимный отзыв:\n\n${text}`;
+    const captionText = `🔔 Анонимное сообщение:\n\n${text}`;
 
     // Проверяем, пришло ли фото и является ли оно файлом
     if (photo && typeof photo === 'object' && photo.size > 0) {
