@@ -42,20 +42,13 @@ form.addEventListener("submit", async function(event) {
         formData.append("photo", photoInput.files[0]);
     }
 
-    try {
+        try {
         const response = await fetch("/api/send-message", {
-    method: "POST",
-    body: formData
-});
-
-// Если сервер вернул ошибку, сначала читаем её как текст
-if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Ответ сервера:", errorText);
-    throw new Error("Сервер вернул ошибку. Проверь логи в панели Vercel.");
+            method: "POST",
+            body: formData
         });
 
-        const result = await response.json();
+        const result = await response.json(); // Сразу парсим JSON
 
         if (response.ok && result.ok) {
             alert("✅ Успешно отправлено в Telegram!");
@@ -63,12 +56,12 @@ if (!response.ok) {
         } else {
             alert("❌ Ошибка: " + (result.description || "Неизвестная ошибка сервера"));
         }
-
     } catch (error) {
         console.error("Ошибка при отправке:", error);
-        alert("🚨 Ошибка сети: проверьте соединение или размер файла");
+        alert("🚨 Ошибка сети");
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = "ОТПРАВИТЬ В ГРУППУ";
     }
+
 });
