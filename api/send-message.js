@@ -33,8 +33,9 @@ export default async function handler(req) {
     } else {
       tgData.append('text', captionText);
     }
+    
+const url = `https://api.telegram.org/bot${TOKEN}/${method}`;
 
-    const url = `https://api.telegram.org/bot${TOKEN}`;
 
     const response = await fetch(url, {
       method: 'POST',
