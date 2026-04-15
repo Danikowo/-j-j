@@ -22,17 +22,23 @@ export default async function handler(req) {
     const tgData = new FormData();
     tgData.append('chat_id', CHAT_ID);
 
+        // Определяем метод и тип контента
     let method = 'sendMessage';
-    const captionText = `🔔 Анонимное сообщение:\n\n${text}`;
+    const captionText = `🔔 Анонимный отзыв:\n\n${text}`;
 
-    // Проверяем, пришло ли фото и является ли оно файлом
     if (photo && typeof photo === 'object' && photo.size > 0) {
-      method = 'sendPhoto';
-      tgData.append('photo', photo);
+      // Проверяем, видео это или картинка по типу файла
+      const isVideo = photo.type.includes('video');
+      
+      method = isVideo ? 'sendVideo' : 'sendPhoto';
+      
+      // В Telegram для видео и фото файл прикрепляется под разными ключами
+      tgData.append(isVideo ? 'video' : 'photo', photo);
       tgData.append('caption', captionText);
     } else {
       tgData.append('text', captionText);
     }
+
     
 const url = `https://api.telegram.org/bot${TOKEN}/${method}`;
 
